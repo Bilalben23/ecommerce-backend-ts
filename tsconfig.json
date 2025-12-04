@@ -1,0 +1,12 @@
+{
+  "extends": "@tsconfig/node24/tsconfig.json",
+  "compilerOptions": {
+     "rootDir": "./", // change it in build time to ./src
+     "outDir": "./dist",
+     
+     "isolatedModules": true,
+     "forceConsistentCasingInFileNames": true
+  },
+  "include": ["src", "tests"],
+  "exclude": ["node_modules", "dist"]
+}
