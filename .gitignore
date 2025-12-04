@@ -1,5 +1,34 @@
-node_modules
-dist
-.env
-.vscode
-coverage
+# -------------------------
+# Node & Environment
+# -------------------------
+node_modules/
+npm-debug.log*
+
+# -------------------------
+# Typescript build output
+# -------------------------
+dist/
+build/
+
+# Vitest cache
+.vitest/
+
+# -------------------------
+# Environment variables
+# -------------------------
+.env 
+.env.*.local
+.env.local
+
+# -------------------------
+# VSCode settings
+# -------------------------
+.vscode/
+.idea/
+
+# -------------------------
+# Logs
+# -------------------------
+logs/
+*.log
+*.log.*
