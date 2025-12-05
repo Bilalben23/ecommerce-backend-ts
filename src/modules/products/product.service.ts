@@ -1,3 +1,4 @@
+import { ApiError } from "../../utils/errors.js";
 import { Product, type IProduct } from "./product.model.js";
 
 
@@ -6,7 +7,7 @@ import { Product, type IProduct } from "./product.model.js";
  * @param data - Partial product data
  * @returns IProduct - Newly created product document
  */
-export const createProductService = async (data: Partial<IProduct>) => {
+export const createProduct = async (data: Partial<IProduct>) => {
     const product = await Product.create(data);
     return product;
 }
@@ -17,7 +18,7 @@ export const createProductService = async (data: Partial<IProduct>) => {
  * @param filters - Optional Query filters (category, tags, isActive, etc.)
  * @returns IProduct[] - Array of product documents
  */
-export const getAllProductsService = async (filters?: Record<string, any>) => {
+export const getAllProducts = async (filters?: Record<string, any>) => {
     const products = await Product.find(filters);
     return products;
 }
@@ -29,9 +30,9 @@ export const getAllProductsService = async (filters?: Record<string, any>) => {
  * @throws Error - if product not found
  * @returns IProduct - document or null if not found
  */
-export const getProductByIdService = async (id: string) => {
+export const getProductById = async (id: string) => {
     const product = await Product.findById(id);
-    if (!product) throw new Error("Product not found");
+    if (!product) throw new ApiError("Product not found", 404);
     return product;
 }
 
@@ -43,12 +44,12 @@ export const getProductByIdService = async (id: string) => {
  * @throws Error - if product not found
  * @returns IProduct - Updated product document
  */
-export const updateProductService = async (id: string, data: Partial<IProduct>) => {
+export const updateProduct = async (id: string, data: Partial<IProduct>) => {
     const updated = await Product.findByIdAndUpdate(id, data, {
         new: true,
         runValidators: true
     })
-    if (!updated) throw new Error("Product not found");
+    if (!updated) throw new ApiError("Product not found", 404);
     return updated;
 }
 
@@ -59,11 +60,11 @@ export const updateProductService = async (id: string, data: Partial<IProduct>) 
  * @throws Error - if product not found
  * @returns IProduct - Soft-deleted product document
  */
-export const deleteProductService = async (id: string) => {
+export const deleteProduct = async (id: string) => {
     const deleted = await Product.findByIdAndUpdate(id,
         { isActive: false },
         { new: true }
     );
-    if (!deleted) throw new Error("Product not found");
+    if (!deleted) throw new ApiError("Product not found", 404);
     return deleted;
 }
