@@ -93,7 +93,7 @@ export const deleteProductHandler = async (req: Request, res: Response) => {
         res.json({
             success: true,
             message: "Product soft deleted successfully",
-            date: deleted
+            data: deleted
         })
 
     } catch (err) {
