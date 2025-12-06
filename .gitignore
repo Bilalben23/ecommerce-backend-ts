@@ -32,3 +32,6 @@ build/
 logs/
 *.log
 *.log.*
+
+
+notes.md

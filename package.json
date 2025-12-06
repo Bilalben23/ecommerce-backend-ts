@@ -10,7 +10,10 @@
     "test": "vitest run",
     "test:watch": "vitest watch"
   },
-  "keywords": [],
+  "keywords": [
+    "ecommerce API",
+    "ecommerce Backend"
+  ],
   "author": "Bilal Ben Youssef",
   "license": "ISC",
   "type": "module",
@@ -24,6 +27,7 @@
     "@tsconfig/node24": "^24.0.3",
     "@types/express": "^5.0.6",
     "@types/node": "^24.10.1",
+    "mongodb-memory-server": "^10.4.1",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "vitest": "^4.0.15"
