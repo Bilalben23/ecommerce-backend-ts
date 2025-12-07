@@ -6,6 +6,30 @@ import app from "../../src/app.js";
 
 beforeAll(async () => {
     await connectTestDB();
+
+
+    // seed multiple products for pagination test
+    for (let i = 1; i <= 25; i++) {
+        await request(app)
+            .post("/api/products")
+            .send({
+                name: `Seed product ${i}`,
+                description: "Pagination seed product",
+                sku: `SEED${i}`,
+                price: 50 + i,
+                categories: ["Tech"],
+                tags: ["seed"],
+                images: [],
+                stock: 5,
+                ratings: {
+                    average: 0,
+                    totalRatings: 0
+                },
+                variants: [],
+                metadata: {},
+                isActive: true
+            })
+    }
 })
 
 
@@ -56,12 +80,43 @@ describe("Product Controllers", () => {
     })
 
 
-    it("GET /api/products - should get all products", async () => {
+    it("GET /api/products - should returned paginated products (default page=1, limit=10)", async () => {
         const res = await request(app).get("/api/products");
 
         expect(res.status).toBe(200);
         expect(res.body.success).toBe(true);
-        expect(res.body.data.length).toBeGreaterThan(0);
+
+        // should return an array of products
+        expect(Array.isArray(res.body.data)).toBe(true);
+
+        expect(res.body.data.length).toBeLessThanOrEqual(10);
+
+        // Pagination object should exist
+        expect(res.body.pagination).toBeDefined();
+        expect(res.body.pagination.page).toBe(1);
+        expect(res.body.pagination.limit).toBe(10);
+
+        // totalPages must be >=1
+        expect(res.body.pagination.totalPages).toBeGreaterThanOrEqual(1);
+    })
+
+
+    it("GET /api/products?page=2&limit=10 - should return paginated result", async () => {
+        const res = await request(app).get("/api/products?page=2&limit=10");
+
+        expect(res.status).toBe(200);
+        expect(res.body.success).toBe(true);
+
+        // data check
+        expect(res.body.data.length).toBe(10);
+
+        // pagination checks
+        expect(res.body.pagination).toBeDefined();
+        expect(res.body.pagination.page).toBe(2);
+        expect(res.body.pagination.limit).toBe(10);
+        expect(res.body.pagination.total).toBeGreaterThan(20);
+        expect(res.body.pagination.totalPages).toBeGreaterThan(2);
+        expect(res.body.pagination.nextPage).toBe(3);
     })
 
 

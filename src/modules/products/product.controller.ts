@@ -1,6 +1,7 @@
 import { Request, Response } from "express-serve-static-core";
 import * as ProductService from './product.service.js';
 import { handleControllerError } from "../../utils/handleError.js";
+import { Product } from "./product.model.js";
 
 
 /**
@@ -23,18 +24,36 @@ export const createProductHandler = async (req: Request, res: Response) => {
 
 
 /**
- * Get all products with optional query filters
- * GET /api/products
+ * GET /api/products - Get all products with optional query filters and pagination
+ * @param filters - Optional query filters (category, tags, isActive, ect.)
+ * @param page - Page number for pagination (default: 1)
+ * @param limit - Number of products per page (default: 10)
+ * @returns IProduct[] - Array of product documents for the requests page  
  */
 export const getAllProductsHandler = async (req: Request, res: Response) => {
     try {
-        const filters = req.query as Record<string, any>;
-        const products = await ProductService.getAllProducts(filters);
+
+        const { page = "1", limit = "10", ...filters } = req.query as Record<string, any>;
+
+        const pageNum = parseInt(page as string, 10);
+        const limitNum = parseInt(limit as string, 10);
+
+        const products = await ProductService.getAllProducts(filters, pageNum, limitNum);
+        const total = await ProductService.countProducts(filters);
+        const totalPages = Math.ceil(total / limitNum);
+        const nextPage = page < totalPages ? pageNum + 1 : null;
 
         res.json({
             success: true,
             message: "Products fetched successfully",
-            data: products
+            data: products,
+            pagination: {
+                total,
+                page: pageNum,
+                limit: limitNum,
+                totalPages,
+                nextPage
+            }
         })
 
     } catch (err) {
@@ -44,8 +63,7 @@ export const getAllProductsHandler = async (req: Request, res: Response) => {
 
 
 /**
- * Get a product by ID
- * GET /api/products/:id
+ * GET /api/products/:id - Get a product by ID
  */
 export const getProductByIdHandler = async (req: Request, res: Response) => {
     try {
@@ -63,8 +81,7 @@ export const getProductByIdHandler = async (req: Request, res: Response) => {
 }
 
 /**
- * Update a product by Id
- * PATCH /api/product/:id
+ * PATCH /api/product/:id - Update a product by Id
  */
 export const updateProductHandler = async (req: Request, res: Response) => {
     try {
@@ -83,8 +100,7 @@ export const updateProductHandler = async (req: Request, res: Response) => {
 
 
 /**
- * Soft delete a product (set isActive=false)
- * DELETE /api/products/:id
+ * DELETE /api/products/:id - Soft delete a product (set isActive=false)
  */
 export const deleteProductHandler = async (req: Request, res: Response) => {
     try {

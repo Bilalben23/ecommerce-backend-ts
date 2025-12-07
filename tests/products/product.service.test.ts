@@ -45,6 +45,28 @@ describe("Product Service", () => {
     })
 
 
+    it("should count products based on filters", async () => {
+        await Product.create({
+            name: "For Count",
+            description: "desc",
+            sku: "CNT1",
+            price: 99,
+            categories: ["Tech"],
+            tags: ["featured"],
+            images: [],
+            stock: 5,
+            ratings: {
+                average: 0,
+                totalRatings: 0
+            },
+            isActive: true
+        });
+
+        const total = await ProductService.countProducts({ isActive: true });
+        expect(total).toBeGreaterThan(0);
+    })
+
+
     it("should get a product by ID", async () => {
         const created = await Product.create({
             name: "To Fetch",

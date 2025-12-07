@@ -22,8 +22,6 @@ export const validate = (schema: ZodType, where: Location = "body") =>
                 errors: formatted
             })
         }
-        console.log(result);
-
 
         next();
     }

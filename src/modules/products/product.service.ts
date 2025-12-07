@@ -14,14 +14,29 @@ export const createProduct = async (data: Partial<IProduct>) => {
 
 
 /**
- * Get all products with optional filters
+ * Get all products with optional filters and pagination
  * @param filters - Optional Query filters (category, tags, isActive, etc.)
- * @returns IProduct[] - Array of product documents
+ * @param page - Page number for pagination (default: 1)
+ * @param limit - Number of products to return per page (default: 10)
+ * @returns Promise<IProduct[]> - The products for the requested page.
  */
-export const getAllProducts = async (filters?: Record<string, any>) => {
-    const products = await Product.find(filters);
+export const getAllProducts = async (filters: Record<string, any> = {}, page = 1, limit = 10) => {
+    const products = await Product.find(filters)
+        .skip((page - 1) * limit)
+        .limit(limit);
     return products;
 }
+
+
+/**
+ * count total number of products matching the filters
+ * @param filters - Optional query filters (category, tags, isActive, ect.)
+ * @returns number - Total count of matching products
+ */
+export const countProducts = (filters: Record<string, any> = {}) => {
+    return Product.countDocuments(filters);
+}
+
 
 
 /**
