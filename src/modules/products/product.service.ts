@@ -21,7 +21,7 @@ export const createProduct = async (data: Partial<IProduct>) => {
  * @returns Promise<IProduct[]> - The products for the requested page.
  */
 export const getAllProducts = async (filters: Record<string, any> = {}, page = 1, limit = 10) => {
-    const products = await Product.find(filters)
+    const products = await Product.find({ ...filters, isActive: true })
         .skip((page - 1) * limit)
         .limit(limit);
     return products;
@@ -46,7 +46,7 @@ export const countProducts = (filters: Record<string, any> = {}) => {
  * @returns IProduct - document or null if not found
  */
 export const getProductById = async (id: string) => {
-    const product = await Product.findById(id);
+    const product = await Product.findOne({ _id: id, isActive: true });
     if (!product) throw new ApiError("Product not found", 404);
     return product;
 }
