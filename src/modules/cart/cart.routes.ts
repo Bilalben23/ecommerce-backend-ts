@@ -1,6 +1,8 @@
 import { Router } from "express";
 import * as CartController from "./cart.controller.js";
 import { authMiddleware } from "../../middlewares/auth.middleware.js";
+import { validate } from "../../middlewares/validate.middleware.js";
+import { addItemSchema, updateItemSchema } from "./cart.validation.js";
 
 const router = Router();
 
@@ -18,13 +20,17 @@ router.get("/", CartController.getCartHandler);
  * @route POST /api/cart
  * @desc Add an item to the cart
  */
-router.post("/", CartController.addItemToCartHandler);
+router.post("/",
+    validate(addItemSchema),
+    CartController.addItemToCartHandler);
 
 /**
  * PATCH /api/cart
  * Update quantity if a specific cart item
  */
-router.patch("/", CartController.updateCartItemHandler);
+router.patch("/",
+    validate(updateItemSchema),
+    CartController.updateCartItemHandler);
 
 /**
  * @route DELETE /api/cart/:productId

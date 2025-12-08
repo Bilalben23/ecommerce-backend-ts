@@ -1,8 +1,9 @@
 import express from 'express';
-import productsRoutes from "./modules/products/product.routes.js";
 import { configDotenv } from "dotenv";
-configDotenv();
+import productsRoutes from "./modules/products/product.routes.js";
+import cartRoutes from "./modules/cart/cart.routes.js";
 
+configDotenv();
 const app = express();
 
 // Middlewares
@@ -10,6 +11,6 @@ app.use(express.json());
 
 // Routes
 app.use("/api/products", productsRoutes);
-
+app.use("/apu/cart", cartRoutes);
 
 export default app;
