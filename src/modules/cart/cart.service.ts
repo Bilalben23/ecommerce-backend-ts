@@ -1,24 +1,13 @@
 import { Types } from "mongoose";
 import { ApiError } from "../../utils/errors.js";
-import { Cart } from "./cart.model.js"
+import { Cart } from "./cart.model.js";
 import { Product } from "../products/product.model.js";
 
 
 /**
- * 
+ * Create an empty cart for a user.
  * @param userId - MongoDB objectId of the user
- * @returns Cart document or null
- */
-export const getCartByUser = async (userId: string) => {
-    return Cart.findOne({ user: userId })
-        .populate("items.product");
-}
-
-
-/**
- * Create a new cart for a user
- * @param userId - MongoDB objectId of the user
- * @returns Created cart
+ * @returns Newly created cart
  */
 export const createCart = (userId: string) => {
     const cart = new Cart({ user: userId, items: [], totalPrice: 0 });
@@ -27,15 +16,29 @@ export const createCart = (userId: string) => {
 
 
 /**
- * Add item to cart
- * @param userId - MongoDB ObjectId of the user
- * @param productId - MongoDB ObjectId of the product
- * @param quantity - Quantity of the product
+ * Get a user's cart. Creates one if it doesn't exist.
+ * @param userId - MongoDB objectId of the user
+ * @returns Cart document
+ */
+export const getCartByUser = async (userId: string) => {
+    let cart = await Cart.findOne({ user: userId })
+        .populate("items.product");
+
+    if (!cart) {
+        cart = await createCart(userId);
+    }
+    return cart;
+}
+
+/**
+ * Add a product to the cart or increase its quantity.
+ * @param userId - User ID
+ * @param productId - Product ID
+ * @param quantity - number to add
  * @returns Updated cart
  */
 export const addItemToCart = async (userId: string, productId: string, quantity: number) => {
-    const cart = await Cart.findOne({ user: userId });
-    if (!cart) throw new ApiError("Cart not found", 404);
+    const cart = await getCartByUser(userId);
 
     const existingItem = cart.items.find(item => item.product.equals(productId))
     if (existingItem) {
@@ -50,28 +53,11 @@ export const addItemToCart = async (userId: string, productId: string, quantity:
 
 
 /**
- * Remove item from cart
- * @param userId - MongoDB ObjectId of the user
- * @param productId - MongoDB ObjectId of the product
- * @returns Updated cart
- */
-export const removeItemFromCart = async (userId: string, productId: string) => {
-    const cart = await Cart.findOne({ user: userId });
-    if (!cart) throw new ApiError("Cart not found", 404);
-
-    cart.items = cart.items.filter(item => !item.product.equals(productId));
-
-    await updateCartTotal(cart);
-
-    return cart.save();
-}
-
-
-/**
- * 
- * @param userId - MongoDB Object of the user
- * @param productId - MongoDB ObjectId of the product
- * @param updatedQuantity - New quantity(replace old one)
+ * Update or replace the quantity of a cart item.
+ * Removes the item if quantity < 1.
+ * @param userId - User ID
+ * @param productId - Product ID
+ * @param updatedQuantity - New quantity value
  * @returns updated cart
  */
 export const updateItemQuantity = async (userId: string, productId: string, updatedQuantity: number) => {
@@ -94,8 +80,26 @@ export const updateItemQuantity = async (userId: string, productId: string, upda
 
 
 /**
- * Clear all items in cart
- * @param userId - MongoDB ObjectId of the user
+ * Remove a product from the cart
+ * @param userId - User ID
+ * @param productId - Product ID
+ * @returns Updated cart
+ */
+export const removeItemFromCart = async (userId: string, productId: string) => {
+    const cart = await Cart.findOne({ user: userId });
+    if (!cart) throw new ApiError("Cart not found", 404);
+
+    cart.items = cart.items.filter(item => !item.product.equals(productId));
+
+    await updateCartTotal(cart);
+
+    return cart.save();
+}
+
+
+/**
+ * Remove all items from a user's cart.
+ * @param userId - User ID
  * @returns Cleared cart
  */
 export const clearCart = async (userId: string) => {

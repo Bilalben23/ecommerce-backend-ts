@@ -69,7 +69,25 @@ describe("Cart Service", () => {
     });
 
 
+    it("should remove item if quantity updated to 0", async () => {
+        await CartService.addItemToCart(userId, productId, 2);
+        const cart = await CartService.updateItemQuantity(userId, productId, 0);
+
+        expect(cart.items.length).toBe(0);
+        expect(cart.totalPrice).toBe(0);
+    })
+
+
+    it("should throw error when updating quantity for non-existing item", async () => {
+        const fakedProductId = new Types.ObjectId().toString();
+        await expect(
+            CartService.updateItemQuantity(userId, fakedProductId, 2)
+        ).rejects.toThrow("Item not found in cart");
+    });
+
+
     it("should remove item from cart", async () => {
+        await CartService.addItemToCart(userId, productId, 1);
         const cartAfterRemove = await CartService.removeItemFromCart(userId, productId);
 
         expect(cartAfterRemove.items.length).toBe(0);
@@ -78,7 +96,6 @@ describe("Cart Service", () => {
 
 
     it("should clear the cart", async () => {
-        // Add item again
         await CartService.addItemToCart(userId, productId, 1);
         const clearedCart = await CartService.clearCart(userId);
 
@@ -86,10 +103,21 @@ describe("Cart Service", () => {
         expect(clearedCart.totalPrice).toBe(0);
     });
 
+
     it("should get cart by user", async () => {
         const cart = await CartService.getCartByUser(userId);
 
         expect(cart).toBeDefined();
         expect(cart?.user.toString()).toBe(userId);
+    })
+
+
+    it("should automatically create a cart for a new user", async () => {
+        const newUserId = new Types.ObjectId().toString();
+        const cart = await CartService.getCartByUser(newUserId);
+
+        expect(cart).toBeDefined();
+        expect(cart.user.toString()).toBe(newUserId);
+        expect(cart.totalPrice).toBe(0);
     })
 })
