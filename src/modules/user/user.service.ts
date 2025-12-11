@@ -8,9 +8,10 @@ import bcrypt from "bcrypt";
  * @param name - User's full name
  * @param email - Unique email address
  * @param password - Plain text password
+ * @param avatar - Optional URL/path to user's avatar
  * @returns Newly created user document
  */
-export const createUser = async (name: string, email: string, password: string) => {
+export const createUser = async (name: string, email: string, password: string, avatar = "") => {
     const existing = await User.find({ email });
     if (existing) throw new ApiError("Email already in use", 400);
 
@@ -20,6 +21,7 @@ export const createUser = async (name: string, email: string, password: string) 
         name,
         email,
         password: hashed,
+        avatar
     })
 
     return user;
@@ -57,4 +59,4 @@ export const getUser = async (id: string) => {
  */
 export const verifyPassword = async (password: string, hashed: string) => {
     return bcrypt.compare(password, hashed);
-} 
+}
