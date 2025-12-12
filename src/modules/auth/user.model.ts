@@ -8,6 +8,8 @@ export interface IUser {
     password: string;
     role: "user" | "admin";
     avatar?: string;
+    passwordResetToken?: string;
+    passwordResetExpires?: Date;
     createdAt?: Date;
     updatedAt?: Date;
 }
@@ -37,7 +39,10 @@ const userSchema = new Schema<IUser>({
     avatar: {
         type: String,
         default: ""
-    }
+    },
+    passwordResetToken: String,
+    passwordResetExpires: Date
+
 }, { timestamps: true });
 
 

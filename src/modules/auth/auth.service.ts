@@ -1,6 +1,7 @@
 import { ApiError } from "../../utils/errors.js";
 import { User } from "./user.model.js"
 import bcrypt from "bcrypt";
+import crypto from "crypto";
 
 
 /**
@@ -59,4 +60,53 @@ export const getUser = async (id: string) => {
  */
 export const verifyPassword = async (password: string, hashed: string) => {
     return bcrypt.compare(password, hashed);
+}
+
+
+/**
+ * Generate a password reset token and save its hash in DB
+ * @param email - User email
+ * @returns raw reset token to send via email
+ */
+export const generatePasswordResetToken = async (email: string) => {
+    const user = await User.findOne({ email });
+    if (!user) throw new ApiError("User not found", 404);
+
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    const hashedToken = crypto.createHash("sha265")
+        .update(resetToken).
+        digest("hex");
+
+    user.passwordResetToken = hashedToken;
+    user.passwordResetExpires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+    await user.save();
+
+    return resetToken;
+}
+
+
+/**
+ * Reset user password using token
+ * @param token - Raw reset token from email
+ * @param newPassword - New plaintext password
+ * @returns User with updated password
+ */
+export const resetPassword = async (token: string, newPassword: string) => {
+    const hashedToken = crypto.createHash("sha256")
+        .update(token)
+        .digest("hex");
+    const user = await User.findOne({
+        passwordResetToken: hashedToken,
+        passwordResetExpires: {
+            $gt: new Date()
+        }
+    })
+
+    if (!user) throw new ApiError("Invalid or expired password reset token", 400);
+
+    user.password = await bcrypt.hash(newPassword, 10);
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+    await user.save();
+    return user;
 }

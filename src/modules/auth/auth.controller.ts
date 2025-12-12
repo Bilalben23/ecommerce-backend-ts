@@ -1,12 +1,13 @@
 import { Request, Response } from "express-serve-static-core";
 import { handleControllerError } from "../../utils/handleError.js";
-import * as UserService from "./user.service.js";
+import * as UserService from "./auth.service.js";
 import { generateAccessToken, generateRefreshToken, setRefreshTokenCookie, type JWTPayload } from "../../utils/jwt.js";
 import jwt from "jsonwebtoken";
+import { ApiError } from "../../utils/errors.js";
 
 /**
  * Register a new user
- * POST /api/users/register
+ * POST /api/auth/register
  */
 export const registerHandler = async (req: Request<{}, {}, { name: string, email: string, password: string, avatar?: string }>, res: Response) => {
     try {
@@ -34,28 +35,17 @@ export const registerHandler = async (req: Request<{}, {}, { name: string, email
 
 /**
  * Login user and return tokens
- * POST /api/users/login
+ * POST /api/auth/login
  */
 export const loginUserHandler = async (req: Request<{}, {}, { email: string, password: string }>, res: Response) => {
     try {
         const { email, password } = req.body;
 
         const user = await UserService.getUserByEmail(email);
-        if (!user) {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid credentials"
-            })
-        }
+        if (!user) throw new ApiError("Invalid credentials", 400);
 
         const match = await UserService.verifyPassword(password, user.password);
-
-        if (!match) {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid credentials"
-            })
-        }
+        if (!match) throw new ApiError("Invalid credentials", 400);
 
         // generate tokens
         const payload: JWTPayload = {
@@ -92,17 +82,12 @@ export const loginUserHandler = async (req: Request<{}, {}, { email: string, pas
 
 /**
  * Refresh access token using refresh token stored in HTTP-only cookie
- * POST /api/users/refresh-token
+ * POST /api/auth/refresh-token
  */
 export const refreshTokenHandler = async (res: Response, req: Request) => {
     try {
         const token = req.cookies?.refreshToken as (string | undefined);
-        if (!token) {
-            return res.status(401).json({
-                success: false,
-                message: "No refresh token provided"
-            });
-        }
+        if (!token) throw new ApiError("No refresh token provided", 401);
 
         const payload = jwt.verify(token, process.env.JWT_REFRESH_SECRET) as JWTPayload;
 
@@ -135,7 +120,7 @@ export const refreshTokenHandler = async (res: Response, req: Request) => {
 
 /**
  * Get user's profile (protected)
- * GET /api/users/me
+ * GET /api/auth/me
  */
 export const getProfileHandler = async (req: Request, res: Response) => {
     try {
@@ -151,6 +136,53 @@ export const getProfileHandler = async (req: Request, res: Response) => {
                 name: user.email,
                 role: user.role
             }
+        })
+
+    } catch (err) {
+        handleControllerError(err, res);
+    }
+}
+
+
+/**
+ * Request password reset
+ * POST /api/auth/request-password-reset
+ */
+export const requestPasswordResetHandler = async (req: Request<{}, {}, { email: string }>, res: Response) => {
+    try {
+        const { email } = req.body;
+        const resetToken = await UserService.generatePasswordResetToken(email);
+
+        // TODO: send resetToken via email link to user
+        console.log("Password reset link:", `https://yourapp.com/reset-password?token=${resetToken}`)
+
+        res.json({
+            success: true,
+            message: "Password reset link sent to email"
+        })
+
+    } catch (err) {
+        handleControllerError(err, res);
+    }
+}
+
+
+/**
+ * Reset password
+ * POST /api/auth/reset-password?token
+ */
+export const resetPasswordHandler = async (req: Request<{}, {}, { password: string }, { token: string }>, res: Response) => {
+    try {
+        const { token } = req.query;
+        const { password } = req.body;
+
+        if (!token) throw new ApiError("Token is required", 400)
+
+        await UserService.resetPassword(token, password);
+
+        res.json({
+            success: true,
+            message: "Password updated successfully"
         })
 
     } catch (err) {
