@@ -13,8 +13,9 @@ import crypto from "crypto";
  * @returns Newly created user document
  */
 export const createUser = async (name: string, email: string, password: string, avatar = "") => {
-    const existing = await User.find({ email });
-    if (existing) throw new ApiError("Email already in use", 400);
+    const existingUser = await User.findOne({ email });
+
+    if (existingUser) throw new ApiError("Email already in use", 400);
 
     const hashed = await bcrypt.hash(password, 10);
 
@@ -73,7 +74,7 @@ export const generatePasswordResetToken = async (email: string) => {
     if (!user) throw new ApiError("User not found", 404);
 
     const resetToken = crypto.randomBytes(32).toString("hex");
-    const hashedToken = crypto.createHash("sha265")
+    const hashedToken = crypto.createHash("sha256")
         .update(resetToken).
         digest("hex");
 

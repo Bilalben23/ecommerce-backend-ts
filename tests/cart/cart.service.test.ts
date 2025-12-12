@@ -82,7 +82,7 @@ describe("Cart Service", () => {
         const fakedProductId = new Types.ObjectId().toString();
         await expect(
             CartService.updateItemQuantity(userId, fakedProductId, 2)
-        ).rejects.toThrow("Item not found in cart");
+        ).rejects.toThrow(/Item not found in cart/i);
     });
 
 
