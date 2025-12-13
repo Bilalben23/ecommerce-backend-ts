@@ -3,6 +3,8 @@ import { connectTestDB, disconnectTestDB } from "../setup/mongo-memory.js";
 import { Types } from "mongoose";
 import { Product } from "../../src/modules/products/product.model.js";
 import * as CartService from "../../src/modules/cart/cart.service.js";
+import bcrypt from "bcrypt";
+import { User } from "../../src/modules/auth/user.model.js";
 
 
 let userId: string;
@@ -10,7 +12,17 @@ let productId: string;
 
 beforeAll(async () => {
     await connectTestDB();
-    userId = new Types.ObjectId().toString();
+
+    const user = await User.create({
+        name: "Test User",
+        email: "testuser@example.com",
+        password: await bcrypt.hash("hashedPassword123", 10),
+        role: "user",
+        avatar: ""
+    })
+
+    userId = user._id.toString();
+
 
     // create a sample product to use in cart
     const product = await Product.create({
