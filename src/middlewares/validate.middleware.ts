@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express-serve-static-core";
+import type { Request, Response, NextFunction } from "express-serve-static-core";
 import { type ZodType, z } from "zod";
 
 

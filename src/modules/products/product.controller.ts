@@ -1,7 +1,6 @@
-import { Request, Response } from "express-serve-static-core";
+import type { Request, Response } from "express-serve-static-core";
 import * as ProductService from './product.service.js';
 import { handleControllerError } from "../../utils/handleError.js";
-import { Product } from "./product.model.js";
 
 
 /**

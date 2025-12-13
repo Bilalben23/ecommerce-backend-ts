@@ -1,4 +1,4 @@
-import { Request, Response } from "express-serve-static-core";
+import type { Request, Response } from "express-serve-static-core";
 import { handleControllerError } from "../../utils/handleError.js";
 import * as CartService from "./cart.service.js";
 
@@ -9,7 +9,7 @@ import * as CartService from "./cart.service.js";
  */
 export const getCartHandler = async (req: Request, res: Response) => {
     try {
-        const userId = (req as any).user._id;
+        const userId = req.user!._id.toString();
         const cart = await CartService.getCartByUser(userId);
 
         res.json({
@@ -30,7 +30,7 @@ export const getCartHandler = async (req: Request, res: Response) => {
  */
 export const addItemToCartHandler = async (req: Request, res: Response) => {
     try {
-        const userId = (req as any).user._id;
+        const userId = req.user!._id.toString();
         const { productId, quantity } = req.body as { productId: string, quantity: number };
         const cart = await CartService.addItemToCart(userId, productId, quantity);
         res.status(201).json({
@@ -51,7 +51,7 @@ export const addItemToCartHandler = async (req: Request, res: Response) => {
  */
 export const updateCartItemHandler = async (req: Request, res: Response) => {
     try {
-        const userId = (req as any).user._id;
+        const userId = req.user!._id.toString();
         const { productId, quantity } = req.body;
         const cart = await CartService.updateItemQuantity(userId, productId, quantity);
 
@@ -72,7 +72,7 @@ export const updateCartItemHandler = async (req: Request, res: Response) => {
  */
 export const removeItemFromHandler = async (req: Request, res: Response) => {
     try {
-        const userId = (req as any).user._id;
+        const userId = req.user!._id.toString();
         const { productId } = req.params;
         const cart = await CartService.removeItemFromCart(userId, productId);
 
@@ -93,7 +93,7 @@ export const removeItemFromHandler = async (req: Request, res: Response) => {
  */
 export const clearCartHandler = async (req: Request, res: Response) => {
     try {
-        const userId = (req as any).user._id;
+        const userId = req.user!._id.toString();
         const cart = await CartService.clearCart(userId);
 
         res.json({

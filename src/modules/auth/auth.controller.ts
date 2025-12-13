@@ -1,9 +1,9 @@
-import { Request, Response } from "express-serve-static-core";
+import type { Request, Response } from "express-serve-static-core";
 import { handleControllerError } from "../../utils/handleError.js";
 import * as UserService from "./auth.service.js";
 import { generateAccessToken, generateRefreshToken, setRefreshTokenCookie, type JWTPayload } from "../../utils/jwt.js";
 import jwt from "jsonwebtoken";
-import { ApiError } from "../../utils/errors.js";
+import { ApiError } from "../../utils/apiError.js";
 
 /**
  * Register a new user
@@ -123,17 +123,14 @@ export const refreshTokenHandler = async (res: Response, req: Request) => {
  */
 export const getProfileHandler = async (req: Request, res: Response) => {
     try {
-        const userId = (req as any).user._id;
-
-        const user = await UserService.getUser(userId);
+        const userDocument = req.user!;
+        const user = userDocument.toObject();
 
         res.json({
             success: true,
             message: "User profile fetched successfully",
             data: {
-                _id: user._id,
-                name: user.email,
-                role: user.role
+                ...user
             }
         })
 

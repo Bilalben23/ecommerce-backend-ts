@@ -1,5 +1,5 @@
 import { Types } from "mongoose";
-import { ApiError } from "../../utils/errors.js";
+import { ApiError } from "../../utils/apiError.js";
 import { Cart } from "./cart.model.js";
 import { Product } from "../products/product.model.js";
 

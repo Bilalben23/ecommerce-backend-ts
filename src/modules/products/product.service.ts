@@ -1,4 +1,4 @@
-import { ApiError } from "../../utils/errors.js";
+import { ApiError } from "../../utils/apiError.js";
 import { Product, type IProduct } from "./product.model.js";
 
 

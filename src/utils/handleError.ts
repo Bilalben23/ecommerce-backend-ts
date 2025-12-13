@@ -1,5 +1,5 @@
-import { ApiError } from "./errors.js";
-import { Response } from "express-serve-static-core";
+import { ApiError } from "./apiError.js";
+import type { Response } from "express-serve-static-core";
 
 
 /**

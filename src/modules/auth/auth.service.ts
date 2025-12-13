@@ -1,4 +1,4 @@
-import { ApiError } from "../../utils/errors.js";
+import { ApiError } from "../../utils/apiError.js";
 import { User } from "./user.model.js"
 import bcrypt from "bcrypt";
 import crypto from "crypto";

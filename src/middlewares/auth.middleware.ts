@@ -1,5 +1,6 @@
-import { Response, Request, NextFunction } from "express-serve-static-core";
+import type { Response, Request, NextFunction } from "express-serve-static-core";
 import passport from "passport";
+import { UserDocument } from "../types/express/index.js";
 
 
 export const authMiddleware = async (
@@ -7,8 +8,13 @@ export const authMiddleware = async (
     res: Response,
     next: NextFunction
 ) => {
-    passport.authenticate("jwt", { session: false }, (err: any, user: any) => {
-        if (err) return next(err);
+    passport.authenticate("jwt", { session: false }, (err: any, user: UserDocument | false) => {
+        if (err) {
+            return res.status(500).json({
+                success: false,
+                message: "An error occurred during authentication"
+            })
+        };
 
         if (!user) {
             return res.status(401).json({

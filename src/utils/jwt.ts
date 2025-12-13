@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { Response } from "express-serve-static-core";
+import type { Response } from "express-serve-static-core";
 
 
 export interface JWTPayload {

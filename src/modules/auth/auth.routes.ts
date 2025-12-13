@@ -1,7 +1,7 @@
 import { Router } from "express";
 import * as AuthController from "./auth.controller.js";
 import { validate } from "../../middlewares/validate.middleware.js";
-// import { authMiddleware } from "../../middlewares/auth.middleware.js";
+import { authMiddleware } from "../../middlewares/auth.middleware.js";
 import {
     loginSchema,
     registerSchema,
@@ -47,7 +47,11 @@ router.post("/refresh-token", AuthController.refreshTokenHandler);
  * @desc GET profile of logged-in user
  * @access Protected
  */
-router.get("/me", AuthController.getProfileHandler);
+router.get(
+    "/me",
+    authMiddleware,
+    AuthController.getProfileHandler
+);
 
 
 /**

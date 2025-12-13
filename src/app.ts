@@ -1,13 +1,12 @@
 import express from 'express';
-import { configDotenv } from "dotenv";
 import productsRoutes from "./modules/products/product.routes.js";
 import cartRoutes from "./modules/cart/cart.routes.js";
 import authRoutes from "./modules/auth/auth.routes.js";
 import cookieParser from "cookie-parser";
 import passport from 'passport';
+import "dotenv/config";
 import "./config/passport.js";
 
-configDotenv();
 const app = express();
 
 // Middlewares

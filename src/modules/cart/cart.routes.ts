@@ -8,7 +8,7 @@ const router = Router();
 
 
 // all routes require authentication
-//router.use(authMiddleware);
+router.use(authMiddleware);
 
 /**
  * @route GET /api/cart
@@ -22,7 +22,8 @@ router.get("/", CartController.getCartHandler);
  */
 router.post("/",
     validate(addItemSchema),
-    CartController.addItemToCartHandler);
+    CartController.addItemToCartHandler
+);
 
 /**
  * PATCH /api/cart
@@ -30,7 +31,8 @@ router.post("/",
  */
 router.patch("/",
     validate(updateItemSchema),
-    CartController.updateCartItemHandler);
+    CartController.updateCartItemHandler
+);
 
 /**
  * @route DELETE /api/cart/:productId
