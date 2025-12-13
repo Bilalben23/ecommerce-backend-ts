@@ -1,6 +1,5 @@
 import { MongoMemoryServer } from "mongodb-memory-server";
 import { connect, connection } from "mongoose";
-import { Product } from "../../src/modules/products/product.model.js";
 
 let mongo: MongoMemoryServer;
 

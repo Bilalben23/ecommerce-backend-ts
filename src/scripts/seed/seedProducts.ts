@@ -1,32 +1,16 @@
 import { faker } from "@faker-js/faker";
-import mongoose from "mongoose";
 import { Product } from "../../modules/products/product.model.js";
-import "dotenv/config";
+import { connectDB, disconnectDB } from "../../database/mongo.js";
 
-const MONGO_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/ecommerce";
 
 // Get optional CLI argument: number of products
-// Example usage: tsx src/scripts/seed/seedProducts.ts 50
+// Example usage: npx tsx src/scripts/seed/seedProducts.ts 50
+
 const NUM_PRODUCTS = Number(process.argv[2]) || 30;
 
 const categories = ["Electronics", "Clothing", "Books", "Toys", "Home", "Sports", "Beauty"];
 const tags = ["New", "Hot", "Sale", "Limited", "Popular"];
 
-/**
- * Connect to MongoDB database
- */
-async function connectDB() {
-    await mongoose.connect(MONGO_URI);
-    console.log("Connected to DB");
-}
-
-/**
- * Disconnect from the MongoDB database
- */
-async function disconnectedDB() {
-    await mongoose.connection.close();
-    console.log("Disconnected from DB")
-}
 
 
 /**
@@ -85,12 +69,16 @@ function generateProductData() {
  * Seed the database with a batch of dummy products
  */
 async function seedProducts() {
+    if (process.env.NODE_ENV === "production") {
+        throw new Error("❌ Seeding is disabled in production");
+    }
+
     try {
         await connectDB();
 
         // Clear existing products before inserting new ones
         await Product.deleteMany({});
-        console.log("Existing products cleared");
+        console.log("🧹 Products collection cleared");
 
         const products = Array.from({ length: NUM_PRODUCTS }, generateProductData);
 
@@ -98,16 +86,11 @@ async function seedProducts() {
         console.log(`${NUM_PRODUCTS} dummy products inserted successfully!`)
 
     } catch (err) {
-        console.error("Error seeding products");
+        console.error("❌ Error seeding products", err);
     } finally {
-        await disconnectedDB();
+        await disconnectDB();
     }
 }
 
 
 seedProducts();
-
-/**
- * Run this script:
- * npx tsx src/scripts/seed/seedProducts.ts
- */

@@ -11,6 +11,7 @@ export const registerSchema = z.object({
         .regex(passwordRegex, "Password must contain at least one letter and one number"),
     avatar: z.url("Avatar must be a valid url")
         .optional()
+        .or(z.literal(""))
 });
 
 

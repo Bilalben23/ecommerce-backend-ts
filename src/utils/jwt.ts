@@ -24,7 +24,6 @@ export const generateAccessToken = (payload: JWTPayload) => {
  * @returns Signed JWT string (expires in 7 days)
  */
 export const generateRefreshToken = (payload: JWTPayload) => {
-    console.log(process.env.JWT_REFRESH_SECRET);
     return jwt.sign(payload, process.env.JWT_REFRESH_SECRET, {
         expiresIn: "7d"
     })

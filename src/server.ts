@@ -1,8 +1,7 @@
 import app from "./app.js";
-import { connectDB } from "./config/connectDB.js";
+import { connectDB } from "./database/mongo.js";
 
 const PORT = process.env.PORT || 3000;
-
 
 async function startServer() {
     await connectDB();

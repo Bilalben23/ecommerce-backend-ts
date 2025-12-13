@@ -1,3 +1,4 @@
+import { error } from "console";
 import type { Request, Response, NextFunction } from "express-serve-static-core";
 import { type ZodType, z } from "zod";
 
@@ -19,7 +20,10 @@ export const validate = (
         const result = schema.safeParse(req[where]);
 
         if (!result.success) {
-            const formatted = z.treeifyError(result.error).errors;
+            const formatted = result.error.issues.map(({ path, message }) => ({
+                field: path.join("."),
+                message
+            }));
 
             return res.status(statusCode).json({
                 success: false,

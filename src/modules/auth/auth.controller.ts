@@ -43,6 +43,7 @@ export const loginUserHandler = async (req: Request<{}, {}, { email: string, pas
 
         const user = await UserService.getUserByEmail(email);
         if (!user) throw new ApiError("Invalid credentials", 400);
+        console.log(user);
 
         const match = await UserService.verifyPassword(password, user.password);
         if (!match) throw new ApiError("Invalid credentials", 400);
@@ -107,6 +108,13 @@ export const refreshTokenHandler = async (req: Request, res: Response) => {
             success: true,
             message: "Token refreshed successfully",
             data: {
+                user: {
+                    _id: user._id,
+                    name: user.name,
+                    email: user.email,
+                    role: user.email,
+                    avatar: user.avatar
+                },
                 accessToken
             }
         })
