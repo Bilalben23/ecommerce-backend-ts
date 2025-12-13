@@ -10,8 +10,9 @@ npm-debug.log*
 dist/
 build/
 
-# Vitest cache
+# Vitest
 .vitest/
+coverage/
 
 # -------------------------
 # Environment variables
