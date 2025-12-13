@@ -90,7 +90,6 @@ export const refreshTokenHandler = async (res: Response, req: Request) => {
         if (!token) throw new ApiError("No refresh token provided", 401);
 
         const payload = jwt.verify(token, process.env.JWT_REFRESH_SECRET) as JWTPayload;
-
         const user = await UserService.getUser(payload._id);
 
         // generate new tokens

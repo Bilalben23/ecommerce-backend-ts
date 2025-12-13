@@ -1,6 +1,14 @@
 import { Router } from "express";
 import * as AuthController from "./auth.controller.js";
+import { validate } from "../../middlewares/validate.middleware.js";
 // import { authMiddleware } from "../../middlewares/auth.middleware.js";
+import {
+    loginSchema,
+    registerSchema,
+    requestPasswordResetSchema,
+    resetPasswordQuerySchema,
+    resetPasswordSchema
+} from "./auth.validation.js";
 
 
 const router = Router();
@@ -9,14 +17,22 @@ const router = Router();
  * @route POST /api/auth/register
  * @desc Register a new user
  */
-router.post("/register", AuthController.registerHandler);
+router.post(
+    "/register",
+    validate(registerSchema),
+    AuthController.registerHandler
+);
 
 
 /**
  * @route POST /api/auth/login
  * @desc Login user and return JWT
  */
-router.post("/login", AuthController.loginUserHandler);
+router.post(
+    "/login",
+    validate(loginSchema),
+    AuthController.loginUserHandler
+);
 
 
 /**
@@ -38,14 +54,22 @@ router.get("/me", AuthController.getProfileHandler);
  * @route POST /api/auth/request-password-reset
  * @desc Request password reset link via email
  */
-router.post("/request-password-reset", AuthController.requestPasswordResetHandler);
+router.post(
+    "/request-password-reset",
+    validate(requestPasswordResetSchema),
+    AuthController.requestPasswordResetHandler
+);
 
 
 /**
  * @route POST /api/users/reset-password
  * @desc Reset password using token from query param
  */
-router.post("/reset-password", AuthController.resetPasswordHandler);
+router.post(
+    "/reset-password",
+    validate(resetPasswordQuerySchema, "query"),
+    validate(resetPasswordSchema),
+    AuthController.resetPasswordHandler);
 
 
 export default router;
