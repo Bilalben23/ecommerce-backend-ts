@@ -53,7 +53,7 @@ export const loginUserHandler = async (req: Request<{}, {}, { email: string, pas
             role: user.role
         }
         const accessToken = generateAccessToken(payload);
-        const refreshToken = generateAccessToken(payload);
+        const refreshToken = generateRefreshToken(payload);
 
         setRefreshTokenCookie(res, refreshToken);
         // set refresh token as httpOnly
@@ -84,7 +84,7 @@ export const loginUserHandler = async (req: Request<{}, {}, { email: string, pas
  * Refresh access token using refresh token stored in HTTP-only cookie
  * POST /api/auth/refresh-token
  */
-export const refreshTokenHandler = async (res: Response, req: Request) => {
+export const refreshTokenHandler = async (req: Request, res: Response) => {
     try {
         const token = req.cookies?.refreshToken as (string | undefined);
         if (!token) throw new ApiError("No refresh token provided", 401);
@@ -171,8 +171,6 @@ export const resetPasswordHandler = async (req: Request<{}, {}, { password: stri
     try {
         const { token } = req.query;
         const { password } = req.body;
-
-        if (!token) throw new ApiError("Token is required", 400)
 
         await UserService.resetPassword(token, password);
 

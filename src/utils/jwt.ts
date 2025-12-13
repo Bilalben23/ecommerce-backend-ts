@@ -24,6 +24,7 @@ export const generateAccessToken = (payload: JWTPayload) => {
  * @returns Signed JWT string (expires in 7 days)
  */
 export const generateRefreshToken = (payload: JWTPayload) => {
+    console.log(process.env.JWT_REFRESH_SECRET);
     return jwt.sign(payload, process.env.JWT_REFRESH_SECRET, {
         expiresIn: "7d"
     })
@@ -39,7 +40,7 @@ export const setRefreshTokenCookie = (res: Response, token: string) => {
     res.cookie("refreshToken", token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
+        sameSite: "lax",
         maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     })
 }

@@ -34,6 +34,6 @@ export const resetPasswordSchema = z.object({
 
 
 export const resetPasswordQuerySchema = z.object({
-    token: z.string()
+    token: z.string({ error: "Token is required" })
         .nonempty("Token is required")
 });
