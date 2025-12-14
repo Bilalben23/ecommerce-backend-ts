@@ -24,7 +24,7 @@ const cartItemSchema = new Schema<ICartItem>({
         required: true,
         min: 1
     }
-})
+}, { _id: false })
 
 
 const cartSchema = new Schema<ICart>({

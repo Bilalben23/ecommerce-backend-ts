@@ -1,7 +1,8 @@
-import { Document, Types } from "mongoose";
 
-interface UserDocument extends Document {
-    _id: Types.ObjectId;
+export { }
+
+interface UserDocument {
+    _id: string;
     name: string;
     email: string;
     role: string;

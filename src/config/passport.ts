@@ -13,7 +13,8 @@ passport.use(
     new JwtStrategy(opts, async (payload: JWTPayload, done) => {
         try {
             const user = await User.findById(payload._id)
-                .select("-password -passwordResetToken -passwordResetExpires -__v");
+                .select("-password -passwordResetToken -passwordResetExpires -__v")
+                .lean();
 
             if (!user) {
                 return done(null, false);

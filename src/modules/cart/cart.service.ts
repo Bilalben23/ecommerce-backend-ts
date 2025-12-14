@@ -22,7 +22,13 @@ export const createCart = (userId: string) => {
  */
 export const getCartByUser = async (userId: string) => {
     let cart = await Cart.findOne({ user: userId })
-        .populate("items.product");
+        .populate({
+            path: "items.product",
+            model: "Product",
+            select: "-__v -isActive"
+        })
+        .select("-__v")
+        .exec();
 
     if (!cart) {
         cart = await createCart(userId);
@@ -61,7 +67,7 @@ export const addItemToCart = async (userId: string, productId: string, quantity:
  * @returns updated cart
  */
 export const updateItemQuantity = async (userId: string, productId: string, updatedQuantity: number) => {
-    const cart = await Cart.findOne({ user: userId });
+    const cart = await Cart.findOne({ user: userId }).select("-__v");
     if (!cart) throw new ApiError("Cart not found", 404);
 
     const item = cart.items.find(i => i.product.equals(productId));
@@ -86,7 +92,7 @@ export const updateItemQuantity = async (userId: string, productId: string, upda
  * @returns Updated cart
  */
 export const removeItemFromCart = async (userId: string, productId: string) => {
-    const cart = await Cart.findOne({ user: userId });
+    const cart = await Cart.findOne({ user: userId }).select("-__v");
     if (!cart) throw new ApiError("Cart not found", 404);
 
     cart.items = cart.items.filter(item => !item.product.equals(productId));
@@ -103,7 +109,7 @@ export const removeItemFromCart = async (userId: string, productId: string) => {
  * @returns Cleared cart
  */
 export const clearCart = async (userId: string) => {
-    const cart = await Cart.findOne({ user: userId });
+    const cart = await Cart.findOne({ user: userId }).select("-__v");
     if (!cart) throw new ApiError("cart not found", 404);
 
     cart.items = [];

@@ -2,7 +2,6 @@ import { beforeAll, describe, expect, it, vi } from "vitest";
 import type { NextFunction, Request, Response } from "express-serve-static-core";
 import passport from "passport";
 import { authMiddleware } from "../../src/middlewares/auth.middleware.js";
-import { UserDocument } from "../../src/types/express/index.js";
 
 /**
  * Mock passport
@@ -107,3 +106,6 @@ describe("authMiddleware", () => {
         expect(mockNext).toHaveBeenCalledOnce();
     });
 })
+
+
+
